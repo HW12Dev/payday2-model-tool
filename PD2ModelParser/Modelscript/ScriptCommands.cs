@@ -397,15 +397,15 @@ namespace PD2ModelParser.Modelscript
             }
 
             S.TopologyIP newTopoIp;
-            S.PassthroughGP newPgp;
+            S.GPBase newPgp;
             if(Instance)
             {
-                newPgp = source.PassthroughGP;
+                newPgp = source.GeometryProducer;
                 newTopoIp = source.TopologyIP;
             }
             else
             {
-                var newGeom = source.PassthroughGP.Geometry.Clone();
+                var newGeom = source.GeometryProducer.Geometry.Clone();
                 newGeom.HashName = new HashName($"{Destination}.Geometry");
 
                 var newTopology = source.TopologyIP.Topology.Clone(Destination);

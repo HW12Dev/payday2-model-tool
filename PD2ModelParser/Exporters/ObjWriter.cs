@@ -238,7 +238,7 @@ namespace PD2ModelParser.Exporters
                             Model model_data = (Model)parsed_sections[sectionheader.id];
                             if (model_data.version == 6)
                                 continue;
-                            PassthroughGP passthrough_section = model_data.PassthroughGP;
+                            GPBase passthrough_section = model_data.GeometryProducer;
                             Geometry geometry_section = passthrough_section.Geometry;
                             Topology topology_section = passthrough_section.Topology;
 
@@ -342,7 +342,7 @@ namespace PD2ModelParser.Exporters
                             Model model_data = (Model)parsed_sections[sectionheader.id];
                             if (model_data.version == 6)
                                 continue;
-                            PassthroughGP passthrough_section = model_data.PassthroughGP;
+                            GPBase passthrough_section = model_data.GeometryProducer;
                             Geometry geometry_section = passthrough_section.Geometry;
                             Topology topology_section = passthrough_section.Topology;
 

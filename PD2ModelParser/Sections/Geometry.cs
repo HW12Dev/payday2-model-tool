@@ -143,7 +143,7 @@ namespace PD2ModelParser.Sections
     }
 
     [ModelFileSection(Tags.geometry_tag)]
-    class Geometry : AbstractSection, ISection, IHashNamed
+    public class Geometry : AbstractSection, ISection, IHashNamed
     {
         // Count of everysingle item in headers (Verts, Normals, UVs, UVs for normalmap, Colors, Unknown 20, Unknown 21, etc)
         public uint vert_count;
@@ -359,7 +359,7 @@ namespace PD2ModelParser.Sections
                 }
             }
 
-            this.HashName = new HashName(instream.ReadUInt64());
+			this.HashName = instream.ReadHashName(); // new HashName(instream.ReadUInt64());
 
             this.remaining_data = null;
             long sect_end = section.offset + 12 + section.size;

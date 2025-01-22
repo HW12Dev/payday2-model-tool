@@ -126,20 +126,28 @@ namespace PD2ModelParser.Sections
 
         public Object3D(BinaryReader instream)
         {
-            // In Object3D::load
-            this.HashName = new HashName(instream.ReadUInt64());
+			// In Object3D::load
+			this.HashName = instream.ReadHashName(); // new HashName(instream.ReadUInt64());
 
-            // in dsl::ParamBlock::load
-            uint child_count = instream.ReadUInt32();
-            var animation_ids = new List<uint>();
+			if (!SerializeUtils.PrePAYDAYTheHeist)
+			{
+				// in dsl::ParamBlock::load
+				uint child_count = instream.ReadUInt32();
+				var animation_ids = new List<uint>();
 
-            for (int x = 0; x < child_count; x++)
-            {
-                uint item = instream.ReadUInt32(); // This is a reference thing, probably not important
-                instream.ReadUInt64(); // Skip eight bytes, as per PD2
-                animation_ids.Add(item);
-            }
-            postloadCallbacks.Add((self, sections) => Animations.AddRange(animation_ids.Select(i => sections.ContainsKey(i) ? (IAnimationController)sections[i] : null)));
+				for (int x = 0; x < child_count; x++)
+				{
+					uint item = instream.ReadUInt32(); // This is a reference thing, probably not important
+					instream.ReadUInt64(); // Skip eight bytes, as per PD2
+					animation_ids.Add(item);
+				}
+				postloadCallbacks.Add((self, sections) => Animations.AddRange(animation_ids.Select(i => sections.ContainsKey(i) ? (IAnimationController)sections[i] : null)));
+			}
+
+			if (SerializeUtils.PrePAYDAYTheHeist)
+			{
+				Matrix4x4 pd = instream.ReadMatrix();
+			}
 
             // In Object3D::load
             Matrix4x4 transform = instream.ReadMatrix();
@@ -150,7 +158,8 @@ namespace PD2ModelParser.Sections
 
             Transform = transform;
 
-            PostLoadRef<Object3D>(instream.ReadUInt32(), i => this.Parent = i);
+			if(!SerializeUtils.PrePAYDAYTheHeist)
+				PostLoadRef<Object3D>(instream.ReadUInt32(), i => this.Parent = i);
 
             this.remaining_data = null;
         }

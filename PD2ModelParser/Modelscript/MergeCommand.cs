@@ -108,8 +108,8 @@ namespace PD2ModelParser.Modelscript
                 var src_obj = GetModel(state, donor, name, "Source");
                 var dst_obj = GetModel(state, state.Data, name, "Destination");
 
-                var src_geo = src_obj.PassthroughGP.Geometry;
-                var dst_geo = dst_obj.PassthroughGP.Geometry;
+                var src_geo = src_obj.GeometryProducer.Geometry;
+                var dst_geo = dst_obj.GeometryProducer.Geometry;
 
                 dst_geo.Headers.Clear();
                 dst_geo.Headers.AddRange(src_geo.Headers);
@@ -126,8 +126,8 @@ namespace PD2ModelParser.Modelscript
                     TransplantAttribute(src_geo.UVs[i], dst_geo.UVs[i]);
                 }
 
-                var src_topo = src_obj.PassthroughGP.Topology;
-                var dst_topo = dst_obj.PassthroughGP.Topology;
+                var src_topo = src_obj.GeometryProducer.Topology;
+                var dst_topo = dst_obj.GeometryProducer.Topology;
 
                 TransplantAttribute(src_topo.facelist, dst_topo.facelist);
                 TransplantAttribute(src_obj.RenderAtoms, dst_obj.RenderAtoms);
@@ -152,7 +152,7 @@ namespace PD2ModelParser.Modelscript
                 throw new Exception(message);
             }
 
-            if (mod.PassthroughGP == null)
+            if (mod.GeometryProducer == null)
             {
                 string message = string.Format("{1} model {0} has no geometry provider", name, reponame);
                 state.Log.Error(message);

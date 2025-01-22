@@ -188,7 +188,7 @@ namespace PD2ModelParser.Importers
                     continue;
                 }
 
-                PassthroughGP passthrough_section = modelSection.PassthroughGP;
+                GPBase passthrough_section = modelSection.GeometryProducer;
                 Geometry geometry_section = passthrough_section.Geometry;
                 Topology topology_section = passthrough_section.Topology;
 
@@ -231,7 +231,7 @@ namespace PD2ModelParser.Importers
         }
 
         private static void AddObject(bool is_new, obj_data obj,
-            Model model_data_section, PassthroughGP passthrough_section,
+            Model model_data_section, GPBase passthrough_section,
             Geometry geometry_section, Topology topology_section)
         {
             List<Face> called_faces = new List<Face>();
@@ -629,7 +629,7 @@ namespace PD2ModelParser.Importers
                         continue;
 
                     Model model_data_section = (Model)fm.parsed_sections[modelSectionid];
-                    PassthroughGP passthrough_section = model_data_section.PassthroughGP;
+                    GPBase passthrough_section = model_data_section.GeometryProducer;
                     Geometry geometry_section = passthrough_section.Geometry;
                     Topology topology_section = passthrough_section.Topology;
 

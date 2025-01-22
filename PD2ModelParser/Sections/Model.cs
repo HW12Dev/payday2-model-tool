@@ -75,7 +75,7 @@ namespace PD2ModelParser.Sections
 
         //Other versions
         [Category("Model")]
-        public PassthroughGP PassthroughGP { get; set; }
+        public GPBase GeometryProducer { get; set; }
         [Category("Model")]
         public TopologyIP TopologyIP { get; set; }
 
@@ -104,7 +104,7 @@ namespace PD2ModelParser.Sections
         [Category("Model")]
         public SkinBones SkinBones { get; set; }
 
-        public Model(string object_name, uint triangleCount, uint vertexCount, PassthroughGP passGP, TopologyIP topoIP, MaterialGroup matg, Object3D parent)
+        public Model(string object_name, uint triangleCount, uint vertexCount, GPBase passGP, TopologyIP topoIP, MaterialGroup matg, Object3D parent)
             : base(object_name, parent)
         {
             this.size = 0;
@@ -112,7 +112,7 @@ namespace PD2ModelParser.Sections
             SectionId = (uint)object_name.GetHashCode();
 
             this.version = 3;
-            this.PassthroughGP = passGP;
+            this.GeometryProducer = passGP;
             this.TopologyIP = topoIP;
             this.RenderAtoms = new List<RenderAtom>();
             RenderAtom nmi = new RenderAtom
@@ -161,6 +161,8 @@ namespace PD2ModelParser.Sections
             this.size = section.size;
             SectionId = section.id;
 
+			if(instream.ReadInt32() != 0) { instream.BaseStream.Position -= 4; }
+
             this.version = instream.ReadUInt32();
 
             if (this.version == 6)
@@ -171,9 +173,60 @@ namespace PD2ModelParser.Sections
                 this.v6_unknown7 = instream.ReadSingle();
                 this.v6_unknown8 = instream.ReadUInt32();
             }
+			else if(this.version == 3)
+			{
+				PostLoadRef<NormalManagingGP>(instream.ReadUInt32(), i => GeometryProducer = i);
+				PostLoadRef<TopologyIP>(instream.ReadUInt32(), i => TopologyIP = i);
+				var renderAtomCount = instream.ReadUInt32();
+
+				for (int x = 0; x < renderAtomCount; x++)
+				{
+					RenderAtom item = new RenderAtom();
+
+					// not accurate to ballistics, ballistics follows:
+					/*
+					 * u32 layer;
+					 * u32 vertex_offset;
+					 * u32 primitives;
+					 * u32 index_offset;
+					 * u32 verticies;
+					 * u32 material_id;
+					 */
+
+					// exporting to gltf WILL FAIL because of this!
+
+
+					item.BaseVertex = instream.ReadUInt32();
+					item.TriangleCount = instream.ReadUInt32();
+					item.BaseIndex = instream.ReadUInt32();
+					item.GeometrySliceLength = instream.ReadUInt32();
+					item.MaterialId = instream.ReadUInt32();
+					instream.ReadUInt32();
+					this.RenderAtoms.Add(item);
+				}
+
+				//this.unknown9 = instream.ReadUInt32();
+				PostLoadRef<MaterialGroup>(instream.ReadUInt32(), i => MaterialGroup = i);
+				this.lightset_ID = instream.ReadUInt32(); // this is a section id afaik
+
+				// Bitmap that stores properties about the model
+				// Bits:
+				// 1: cast_shadows
+				// 3: has_opacity
+				this.properties_bitmap = instream.ReadUInt32();
+
+				this.BoundsMin = instream.ReadVector3();
+				this.BoundsMax = instream.ReadVector3();
+
+				this.BoundingRadius = instream.ReadSingle();
+				this.unknown13 = instream.ReadUInt32();
+
+				// ballistics models have no bones
+				// PostLoadRef<SkinBones>(instream.ReadUInt32(), i => SkinBones = i);
+			}
             else
             {
-                PostLoadRef<PassthroughGP>(instream.ReadUInt32(), i => PassthroughGP = i);
+                PostLoadRef<PassthroughGP>(instream.ReadUInt32(), i => GeometryProducer = i);
                 PostLoadRef<TopologyIP>(instream.ReadUInt32(), i => TopologyIP = i);
                 var renderAtomCount = instream.ReadUInt32();
 
@@ -197,6 +250,9 @@ namespace PD2ModelParser.Sections
                 // 1: cast_shadows
                 // 3: has_opacity
                 this.properties_bitmap = instream.ReadUInt32();
+
+				// extra properties, used only in ballistics?
+				instream.ReadCString();
 
                 this.BoundsMin = instream.ReadVector3();
                 this.BoundsMax = instream.ReadVector3();
@@ -224,7 +280,7 @@ namespace PD2ModelParser.Sections
             }
             else
             {
-                outstream.Write(this.PassthroughGP.SectionId);
+                outstream.Write(this.GeometryProducer.SectionId);
                 outstream.Write(this.TopologyIP.SectionId);
                 outstream.Write((uint)this.RenderAtoms.Count);
                 foreach (RenderAtom modelitem in this.RenderAtoms)
@@ -262,7 +318,7 @@ namespace PD2ModelParser.Sections
             else
             {
                 var atoms_string = string.Join(",", RenderAtoms.Select(i => i.ToString()));
-                return $"{base.ToString()} version: {this.version} passthroughGP_ID: {this.PassthroughGP?.SectionId} topologyIP_ID: {this.TopologyIP?.SectionId} RenderAtoms: {this.RenderAtoms.Count} items: [{atoms_string}] MaterialGroup: {this.MaterialGroup.SectionId} unknown10: {this.lightset_ID} bounds_min: {this.BoundsMin} bounds_max: {this.BoundsMax} unknown11: {this.properties_bitmap} BoundingRadius: {this.BoundingRadius} unknown13: {this.unknown13} skinbones_ID: {this.SkinBones?.SectionId ?? 0}{(this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "")}";
+                return $"{base.ToString()} version: {this.version} passthroughGP_ID: {this.GeometryProducer?.SectionId} topologyIP_ID: {this.TopologyIP?.SectionId} RenderAtoms: {this.RenderAtoms.Count} items: [{atoms_string}] MaterialGroup: {this.MaterialGroup.SectionId} unknown10: {this.lightset_ID} bounds_min: {this.BoundsMin} bounds_max: {this.BoundsMax} unknown11: {this.properties_bitmap} BoundingRadius: {this.BoundingRadius} unknown13: {this.unknown13} skinbones_ID: {this.SkinBones?.SectionId ?? 0}{(this.remaining_data != null ? " REMAINING DATA! " + this.remaining_data.Length + " bytes" : "")}";
             }
         }
 
@@ -270,7 +326,7 @@ namespace PD2ModelParser.Sections
         {
             if (version != 3) { return; }
 
-            var gp = this.PassthroughGP;
+            var gp = this.GeometryProducer;
             if (gp == null) { return; }
 
             var geo = gp.Geometry;

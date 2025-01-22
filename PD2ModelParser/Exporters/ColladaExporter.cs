@@ -66,7 +66,7 @@ namespace PD2ModelParser
 
                     string model_id = model_i + "-" + model_data.HashName;
 
-                    PassthroughGP passthrough_section = model_data.PassthroughGP;
+                    GPBase passthrough_section = model_data.GeometryProducer;
                     Geometry geometry_section = passthrough_section.Geometry;
                     Topology topology_section = passthrough_section.Topology;
                     geometry geom = SerializeModel(geometry_section, topology_section, model_data, model_id);

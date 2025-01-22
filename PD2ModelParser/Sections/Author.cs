@@ -19,7 +19,7 @@ namespace PD2ModelParser.Sections
         {
             this.SectionId = section.id;
             this.size = section.size;
-            this.HashName = new HashName(instream.ReadUInt64());
+			this.HashName = instream.ReadHashName(); // new HashName(instream.ReadUInt64());
 
             this.email = instream.ReadCString();
             this.source_file = instream.ReadCString();

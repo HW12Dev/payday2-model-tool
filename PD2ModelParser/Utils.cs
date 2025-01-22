@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 
 namespace PD2ModelParser
 {
@@ -27,9 +29,11 @@ namespace PD2ModelParser
         public const uint lookAtConstrRotationController = 0x679D695B; //LookAtConstrRotationController
         public const uint camera_tag = 0x46BF31A7; //Camera
 
-        // Custom tags - not used in vanilla PD2, but used here for whatever reason
-        // To generate these on Linux, use xxd -l 4 /dev/random
-        public const uint custom_hashlist_tag = 0x7c7844fd;
+		public const uint normalManaging_tag = 0x2C1F096F;
+
+		// Custom tags - not used in vanilla PD2, but used here for whatever reason
+		// To generate these on Linux, use xxd -l 4 /dev/random
+		public const uint custom_hashlist_tag = 0x7c7844fd;
     }
 
     static class MathUtil

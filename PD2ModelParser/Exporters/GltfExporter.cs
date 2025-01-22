@@ -199,14 +199,14 @@ namespace PD2ModelParser.Exporters
 
         GLTF.Mesh GetMeshForModel(Model model)
         {
-            if(model.PassthroughGP == null)
+            if(model.GeometryProducer == null)
             {
                 return null;
             }
 
             var mesh = root.CreateMesh(model.Name);
 
-            var secPassthrough = model.PassthroughGP;
+            var secPassthrough = model.GeometryProducer;
             var geometry = secPassthrough.Geometry;
             var topology = secPassthrough.Topology;
             var materialGroup = model.MaterialGroup;

@@ -218,9 +218,9 @@ namespace PD2ModelParser.Importers
 
             var ms = new MeshSections();
             ms.topoip = model.TopologyIP;
-            ms.passgp = model.PassthroughGP;
-            ms.geom = ms.passgp.Geometry;
-            ms.topo = ms.passgp.Topology;
+            ms.geometryproducer = model.GeometryProducer;
+            ms.geom = ms.geometryproducer.Geometry;
+            ms.topo = ms.geometryproducer.Topology;
             ms.atoms = md.renderAtoms;
 
             ms.PopulateFromMeshData(md);
@@ -299,15 +299,15 @@ namespace PD2ModelParser.Importers
             ms.topoip = new DM.TopologyIP(ms.topo);
             data.AddSection(ms.topoip);
 
-            ms.passgp = new DM.PassthroughGP(ms.geom, ms.topo);
-            data.AddSection(ms.passgp);
+            ms.geometryproducer = new DM.PassthroughGP(ms.geom, ms.topo);
+            data.AddSection(ms.geometryproducer);
 
             ms.atoms = md.renderAtoms;
 
             ms.PopulateFromMeshData(md);
             ms.Scale(this.scaleFactor);
 
-            var model = new DM.Model(name, (uint)ms.geom.verts.Count, (uint)ms.topo.facelist.Count, ms.passgp, ms.topoip, matGroup, null);
+            var model = new DM.Model(name, (uint)ms.geom.verts.Count, (uint)ms.topo.facelist.Count, ms.geometryproducer, ms.topoip, matGroup, null);
             model.RenderAtoms = md.renderAtoms;
 
             return model;
@@ -372,7 +372,7 @@ namespace PD2ModelParser.Importers
             // This whole system slightly improves performance and makes debugging messed up bone
             // issues easier, since PD2's models don't include these bones and thus leaving them out
             // allows for direct comparisons of matrices etc.
-            DM.Geometry geom = model.PassthroughGP.Geometry;
+            DM.Geometry geom = model.GeometryProducer.Geometry;
             HashSet<ushort> usedBones = new HashSet<ushort>();
             usedBones.Add(0); // Assume this is always here for sake of remapping
             float threshold = 0.00001f;
@@ -467,7 +467,7 @@ namespace PD2ModelParser.Importers
             }
 
             // Remap the bone IDs in the geometry
-            DM.Geometry geom = model.PassthroughGP.Geometry;
+            DM.Geometry geom = model.GeometryProducer.Geometry;
             for (int i = 0; i < geom.vert_count; i++)
             {
                 DM.GeometryWeightGroups group = geom.weight_groups[i];
@@ -484,7 +484,7 @@ namespace PD2ModelParser.Importers
             public DM.Geometry geom;
             public DM.Topology topo;
             public DM.TopologyIP topoip;
-            public DM.PassthroughGP passgp;
+            public DM.GPBase geometryproducer;
             public List<DM.RenderAtom> atoms = new List<DM.RenderAtom>();
 
             public void PopulateFromMeshData(MeshData md)

@@ -45,7 +45,7 @@ namespace PD2ModelParser.Sections
     }
 
     [ModelFileSection(Tags.topology_tag)]
-    class Topology : AbstractSection, ISection, IHashNamed
+    public class Topology : AbstractSection, ISection, IHashNamed
     {
         public UInt32 unknown1 { get; set; }
         public List<Face> facelist = new List<Face>();
@@ -95,7 +95,7 @@ namespace PD2ModelParser.Sections
 
             this.count2 = instream.ReadUInt32();
             this.items2 = instream.ReadBytes((int) this.count2);
-            this.HashName = new HashName(instream.ReadUInt64());
+			this.HashName = instream.ReadHashName(); // new HashName(instream.ReadUInt64());
 
             this.remaining_data = null;
             if ((section.offset + 12 + section.size) > instream.BaseStream.Position)

@@ -21,7 +21,7 @@ namespace PD2ModelParser.Sections
         {
             this.SectionId = section.id;
             this.size = section.size;
-            this.HashName = new HashName(instream.ReadUInt64());
+			this.HashName = instream.ReadHashName(); //new HashName(instream.ReadUInt64());
             this.unknown2 = instream.ReadUInt32();
             this.keyframe_length = instream.ReadSingle();
             this.count = instream.ReadUInt32();

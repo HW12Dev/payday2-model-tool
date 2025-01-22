@@ -28,7 +28,7 @@ namespace PD2ModelParser.Sections
         {
             this.SectionId = sh.id;
 
-            HashName = new HashName(br.ReadUInt64());
+			HashName = br.ReadHashName(); // new HashName(br.ReadUInt64());
             Unknown1 = br.ReadUInt32();
             PostLoadRef<ISection>(br.ReadUInt32(), s => Unknown2 = s);
             PostLoadRef<ISection>(br.ReadUInt32(), s => Unknown3 = s);

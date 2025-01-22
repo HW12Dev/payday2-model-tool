@@ -41,17 +41,24 @@ namespace PD2ModelParser.Sections
             this.SectionId = section.id;
             this.size = section.size;
 
-            this.HashName = new HashName(instream.ReadUInt64());
+			this.HashName = instream.ReadHashName(); //new HashName(instream.ReadUInt64());
             this.skipped = instream.ReadBytes(48);
             this.count = instream.ReadUInt32();
 
-            for (int x = 0; x < this.count; x++)
-            {
-                MaterialItem item = new MaterialItem();
-                item.unknown1 = instream.ReadUInt32();
-                item.unknown2 = instream.ReadUInt32();
-                this.items.Add(item);
-            }
+			if (!SerializeUtils.PrePAYDAYTheHeist)
+			{
+				for (int x = 0; x < this.count; x++)
+				{
+					MaterialItem item = new MaterialItem();
+					item.unknown1 = instream.ReadUInt32();
+					item.unknown2 = instream.ReadUInt32();
+					this.items.Add(item);
+				}
+			}
+			else
+			{
+				// 5 refids go here, however it is easiest to let remaining_data take care of them
+			}
 
             this.remaining_data = null;
             if ((section.offset + 12 + section.size) > instream.BaseStream.Position)

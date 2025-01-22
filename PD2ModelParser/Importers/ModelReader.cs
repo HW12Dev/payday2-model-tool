@@ -2,7 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
-
+using System.Windows;
 using PD2ModelParser.Sections;
 
 namespace PD2ModelParser
@@ -58,14 +58,27 @@ namespace PD2ModelParser
         public static List<SectionHeader> ReadHeaders(BinaryReader br)
         {
             int random = br.ReadInt32();
-            int filesize = br.ReadInt32();
-            int sectionCount;
-            if (random == -1)
-            {
-                sectionCount = br.ReadInt32();
-            }
-            else
-                sectionCount = random;
+
+			int filesize;
+			int sectionCount;
+
+			if (random == -1)
+			{
+				filesize = br.ReadInt32();
+				sectionCount = br.ReadInt32();
+			}
+			else
+			{
+				filesize = -1;
+				sectionCount = random;
+
+			}
+
+			var mbResult = MessageBox.Show("Is this model from a game pre-PAYDAY: The Heist?", "", MessageBoxButton.YesNo, MessageBoxImage.Question);
+			if (mbResult == MessageBoxResult.Yes)
+				SerializeUtils.PrePAYDAYTheHeist = true;
+			else
+				SerializeUtils.PrePAYDAYTheHeist = false;
 
             Log.Default.Debug("Size: {0} bytes, Sections: {1},{2}", filesize, sectionCount, br.BaseStream.Position);
 

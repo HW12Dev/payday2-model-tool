@@ -6,7 +6,7 @@ using PD2ModelParser.Sections;
 
 namespace PD2ModelParser
 {
-    class obj_data
+    public class obj_data
     {
         public List<Vector3> verts { get; set; }
 

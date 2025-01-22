@@ -1,4 +1,7 @@
-﻿namespace PD2ModelParser
+﻿using System.IO;
+using System;
+
+namespace PD2ModelParser
 {
     static class SerializeUtils
     {
@@ -78,5 +81,15 @@
             outstream.Write(matrix.M43);
             outstream.Write(matrix.M44);
         }
-    }
+
+
+		public static bool PrePAYDAYTheHeist { get; set; } = false;
+		public static HashName ReadHashName(this BinaryReader br)
+		{
+			if (!PrePAYDAYTheHeist)
+				return new HashName(br.ReadUInt64());
+			return new HashName(br.ReadCString());
+		}
+		public static void WriteHashName(this BinaryWriter bw, HashName hashName) { }
+	}
 }
