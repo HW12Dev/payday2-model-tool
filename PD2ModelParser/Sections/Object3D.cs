@@ -141,12 +141,16 @@ namespace PD2ModelParser.Sections
             }
             postloadCallbacks.Add((self, sections) => Animations.AddRange(animation_ids.Select(i => sections.ContainsKey(i) ? (IAnimationController)sections[i] : null)));
 
+            instream.ReadMatrix();
+
             // In Object3D::load
             Matrix4x4 transform = instream.ReadMatrix();
 
             transform.M41 = instream.ReadSingle();
             transform.M42 = instream.ReadSingle();
             transform.M43 = instream.ReadSingle();
+
+            instream.ReadCString();
 
             Transform = transform;
 
@@ -165,10 +169,15 @@ namespace PD2ModelParser.Sections
                 outstream.Write((ulong) 0); // Bit to skip - the PD2 binary does the exact same thing
             }
 
+            outstream.Write(this.Transform); // dummy
+
             outstream.Write(this.Transform);
             outstream.Write(this.Transform.M41); // Write the position out again, as for some reason
             outstream.Write(this.Transform.M42); // it's not stored in the main matrix
             outstream.Write(this.Transform.M43);
+
+            outstream.WriteCString("");
+
             outstream.Write(this.parentID);
 
             if (this.remaining_data != null)
