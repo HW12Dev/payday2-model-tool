@@ -24,6 +24,14 @@
                 sb.Append((char)buf);
             return sb.ToString();
         }
+        static public void WriteCString(this System.IO.BinaryWriter self, string str)
+        {
+            foreach (char c in str)
+            {
+                self.Write(c);
+            }
+            self.Write((char)0);
+        }
 
         public static System.Numerics.Matrix4x4 ReadMatrix(this System.IO.BinaryReader instream)
         {
